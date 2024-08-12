@@ -50,7 +50,7 @@
       "image": "<<ACCOUNT_ID>>.dkr.ecr.eu-central-1.amazonaws.com/backend:latest",
       "dockerLabels": {
         "PROMETHEUS_EXPORTER_PORT": "8081",
-        "PROMETHEUS_EXPORTER_PATH": "/backend/status/v1/prometheus",
+        "PROMETHEUS_EXPORTER_PATH": "/actuator/prometheus",
         "application": "backend",
         "PROMETHEUS_EXPORTER_JOB_NAME": "backend"
       },
