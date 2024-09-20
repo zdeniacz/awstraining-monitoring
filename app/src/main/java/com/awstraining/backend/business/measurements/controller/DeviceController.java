@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 
 @RestController
 @RequestMapping("device/v1")
@@ -23,9 +25,12 @@ class DeviceController implements DeviceIdApi {
 
     private final MeasurementService service;
 
+    private final MeterRegistry meterRegistry;
+
     @Autowired
-    public DeviceController(final MeasurementService service) {
+    public DeviceController(final MeasurementService service, final MeterRegistry) {
         this.service = service;
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
@@ -33,6 +38,7 @@ class DeviceController implements DeviceIdApi {
         LOGGER.info("Publishing measurement for device '{}'", deviceId);
         final MeasurementDO measurementDO = fromMeasurement(deviceId, measurement);
         service.saveMeasurement(measurementDO);
+        Counter counter = Counter.builder("publishMeasurementsCounter").tag("method", "publishMeasurements").register(meterRegistry);
         return ResponseEntity.ok(measurement);
     }
     @Override
@@ -43,7 +49,13 @@ class DeviceController implements DeviceIdApi {
                 .map(this::toMeasurement)
                 .toList();
         LOGGER.info("Retrieving size of measurement '{}'", measurements.size());
+
+        // String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+        Counter counter = Counter.builder("retrieveMeasurementsCounter").tag("method", "retrieveMeasurements").register(meterRegistry);
+        counter.increment();
+
         final Measurements measurementsResult = new Measurements();
+
         measurementsResult.measurements(measurements);
         return ResponseEntity.ok(measurementsResult);
     }
