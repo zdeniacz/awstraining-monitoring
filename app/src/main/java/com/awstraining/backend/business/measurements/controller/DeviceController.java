@@ -28,7 +28,7 @@ class DeviceController implements DeviceIdApi {
     private final MeterRegistry meterRegistry;
 
     @Autowired
-    public DeviceController(final MeasurementService service, final MeterRegistry) {
+    public DeviceController(final MeasurementService service, final MeterRegistry meterRegistry) {
         this.service = service;
         this.meterRegistry = meterRegistry;
     }
