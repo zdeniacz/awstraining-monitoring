@@ -38,7 +38,13 @@ class DeviceController implements DeviceIdApi {
         LOGGER.info("Publishing measurement for device '{}'", deviceId);
         final MeasurementDO measurementDO = fromMeasurement(deviceId, measurement);
         service.saveMeasurement(measurementDO);
-        Counter counter = Counter.builder("publishMeasurementsCounter").tag("method", "publishMeasurements").register(meterRegistry);
+ 
+         Counter counter = Counter
+                    .builder("publishMeasurements.counter")
+                    .tag("method", "publishMeasurements")
+                    .register(meterRegistry);
+        counter.increment();
+
         return ResponseEntity.ok(measurement);
     }
     @Override
@@ -50,8 +56,10 @@ class DeviceController implements DeviceIdApi {
                 .toList();
         LOGGER.info("Retrieving size of measurement '{}'", measurements.size());
 
-        // String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
-        Counter counter = Counter.builder("retrieveMeasurementsCounter").tag("method", "retrieveMeasurements").register(meterRegistry);
+         Counter counter = Counter
+                    .builder("retrieveMeasurements.counter")
+                    .tag("method", "retrieveMeasurements")
+                    .register(meterRegistry);
         counter.increment();
 
         final Measurements measurementsResult = new Measurements();
